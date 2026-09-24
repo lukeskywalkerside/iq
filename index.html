@@ -188,6 +188,20 @@
       </div>
     </div>
 
+    <script>
+      // Runs even if the app bundle never loads: after 5s with no sign of the
+      // app, say so instead of spinning forever.
+      setTimeout(function () {
+        if (window.__pulseStage) return;
+        var el = document.getElementById('loading');
+        el.className = 'loading failed';
+        el.querySelector('span').innerHTML =
+          '<b>The app script did not load</b>' +
+          'Something is blocking it (ad-blocker, privacy extension, VPN or proxy), ' +
+          'or the browser is too old for modern JavaScript.<br><br>' +
+          'Try an incognito window with extensions off, or another browser.';
+      }, 5000);
+    </script>
     <script type="module" src="/src/main.ts"></script>
   </body>
 </html>

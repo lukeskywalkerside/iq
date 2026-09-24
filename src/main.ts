@@ -1,4 +1,6 @@
 import './style.css';
+// First thing: prove to the inline watchdog in index.html that we're running.
+(window as unknown as { __pulseStage: string }).__pulseStage = 'script';
 import { Application } from 'pixi.js';
 import { ASSETS, Feed, assetById, iconUrl, type Asset, type FeedStatus } from './feed';
 import { Chart, dur, type ChartMode, type Dir, type TradeView } from './chart';
@@ -84,6 +86,7 @@ window.addEventListener('error', (e) => bootError('Something broke', e.error ?? 
 window.addEventListener('unhandledrejection', (e) => bootError('Something broke', e.reason));
 
 const app = new Application();
+loadingMsg.textContent = 'Starting graphics…';
 try {
   await app.init({
     resizeTo: host,
@@ -97,6 +100,7 @@ try {
   throw err;
 }
 host.appendChild(app.canvas);
+loadingMsg.textContent = 'Connecting to the price feed…';
 // Pixi's resizeTo only watches the window; the host also changes size on its
 // own (positions bar, drawer, mobile layout), so track it directly.
 new ResizeObserver(() => app.resize()).observe(host);
