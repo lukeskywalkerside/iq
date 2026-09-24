@@ -7,6 +7,12 @@ import { Chart, dur, type ChartMode, type Dir, type TradeView } from './chart';
 import { sfx } from './sound';
 import { glide, installRipples, retrigger } from './ui';
 
+// Everything runs inside an async function rather than with top-level await.
+// With a top-level await this module stays "evaluating" while Pixi dynamically
+// imports its renderer chunk; that chunk imports shared code from this bundle,
+// which can't finish evaluating -> the production build deadlocks on init.
+void (async () => {
+
 // Practice-only prototype: trades settle in the browser. A real product must
 // settle on the server against its own recorded price.
 const START_BALANCE = 10_000;
@@ -790,3 +796,4 @@ setStake(state.stake);
 setMode(state.mode);
 updateExpiryLabel();
 renderDrawer();
+})();
