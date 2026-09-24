@@ -85,7 +85,10 @@ export class Feed {
   // Backfill ~15 minutes of 1-second candles so the chart isn't empty.
   private async seed(a: Asset) {
     try {
-      const res = await fetch(`${API}/klines?symbol=${a.id.toUpperCase()}&interval=1s&limit=1000`);
+      // Hard timeout: a blocked or geo-fenced endpoint must not hang the boot.
+      const res = await fetch(`${API}/klines?symbol=${a.id.toUpperCase()}&interval=1s&limit=1000`, {
+        signal: AbortSignal.timeout(6000),
+      });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const rows = (await res.json()) as unknown[][];
       const now = Date.now();
@@ -105,7 +108,9 @@ export class Feed {
   private async refresh24() {
     try {
       const symbols = JSON.stringify(ASSETS.map((a) => a.id.toUpperCase()));
-      const res = await fetch(`${API}/ticker/24hr?symbols=${encodeURIComponent(symbols)}`);
+      const res = await fetch(`${API}/ticker/24hr?symbols=${encodeURIComponent(symbols)}`, {
+        signal: AbortSignal.timeout(6000),
+      });
       if (!res.ok) return;
       const rows = (await res.json()) as { symbol: string; priceChangePercent: string }[];
       for (const r of rows) this.change24.set(r.symbol.toLowerCase(), Number(r.priceChangePercent));

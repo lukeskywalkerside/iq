@@ -69,14 +69,33 @@ function resolveExpiry(now: number) {
 // Pixi + feed boot
 // ---------------------------------------------------------------------------
 const host = $('#canvasHost');
+const loadingEl = $('#loading');
+const loadingMsg = loadingEl.querySelector('span')!;
+
+// Anything that goes wrong while booting is shown in the overlay, so a broken
+// deployment says why instead of spinning forever.
+function bootError(what: string, err: unknown) {
+  const msg = err instanceof Error ? err.message : String(err);
+  loadingEl.classList.add('failed');
+  loadingMsg.innerHTML = `<b>${what}</b>${msg}<br><br>Try a different browser, or disable extensions / VPN and reload.`;
+  console.error(what, err);
+}
+window.addEventListener('error', (e) => bootError('Something broke', e.error ?? e.message));
+window.addEventListener('unhandledrejection', (e) => bootError('Something broke', e.reason));
+
 const app = new Application();
-await app.init({
-  resizeTo: host,
-  antialias: true,
-  backgroundAlpha: 0,
-  resolution: Math.min(window.devicePixelRatio || 1, 2),
-  autoDensity: true,
-});
+try {
+  await app.init({
+    resizeTo: host,
+    antialias: true,
+    backgroundAlpha: 0,
+    resolution: Math.min(window.devicePixelRatio || 1, 2),
+    autoDensity: true,
+  });
+} catch (err) {
+  bootError('Graphics failed to start (WebGL/WebGPU unavailable?)', err);
+  throw err;
+}
 host.appendChild(app.canvas);
 // Pixi's resizeTo only watches the window; the host also changes size on its
 // own (positions bar, drawer, mobile layout), so track it directly.
@@ -90,8 +109,11 @@ feed.onStatus = (s: FeedStatus) => {
   statusEl.textContent =
     s === 'live' ? 'LIVE · Binance' : s === 'simulated' ? 'Simulated prices' : 'connecting…';
 };
-await feed.start();
-$('#loading').classList.add('hidden-fade');
+const slow = window.setTimeout(() => (loadingMsg.textContent = 'Still connecting to the price feed…'), 3000);
+// Belt and braces: even if the feed misbehaves, show the room after 10s.
+await Promise.race([feed.start(), new Promise((r) => setTimeout(r, 10_000))]);
+window.clearTimeout(slow);
+loadingEl.classList.add('hidden-fade');
 
 // ---------------------------------------------------------------------------
 // Asset tabs + picker

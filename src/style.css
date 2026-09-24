@@ -316,6 +316,9 @@ button.menu-item:hover, .menu-item.opt:hover { background: var(--surface3); }
   color: var(--muted); z-index: 10; background: var(--surface); transition: opacity .3s; font-size: 12px; letter-spacing: .06em; text-transform: uppercase;
 }
 .loading.hidden-fade { opacity: 0; pointer-events: none; }
+.loading.failed { text-transform: none; letter-spacing: 0; font-size: 13px; line-height: 1.6; color: var(--text); text-align: center; max-width: 100%; padding: 0 24px; }
+.loading.failed .spinner { display: none; }
+.loading.failed b { display: block; color: var(--down); margin-bottom: 4px; }
 .spinner { width: 28px; height: 28px; border: 2px solid var(--line2); border-top-color: var(--accent); animation: spin .8s linear infinite; }
 @keyframes spin { to { transform: rotate(360deg); } }
 
