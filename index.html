@@ -1,0 +1,193 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Pulse — Trade Room</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@500;600&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <div id="app">
+      <!-- ================= top bar ================= -->
+      <header class="top">
+        <div class="brand">
+          <svg viewBox="0 0 24 24" class="logo" aria-hidden="true">
+            <path d="M2 13h4l3-8 4 14 3-9 2 3h4" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+          <span class="brand-name">PULSE</span>
+        </div>
+        <div class="tabs" id="tabs"></div>
+        <div class="right">
+          <div class="fps" id="fps" title="Frames per second — the smoothness test">-- FPS</div>
+          <button id="mute" class="icon-btn" title="Toggle sound">
+            <svg viewBox="0 0 24 24"><path d="M4 9h4l5-4v14l-5-4H4z" fill="currentColor" /><path id="muteWave" d="M16 8.5a5 5 0 0 1 0 7M18.5 6a8.5 8.5 0 0 1 0 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" /></svg>
+          </button>
+          <div class="acct" id="acct">
+            <button class="acct-btn" id="acctBtn">
+              <span class="acct-label">Practice account <svg viewBox="0 0 12 12"><path d="M3 4.5 6 7.5 9 4.5" fill="none" stroke="currentColor" stroke-width="1.6" /></svg></span>
+              <span class="acct-bal mono" id="balance">$10,000.00</span>
+            </button>
+            <div class="menu hidden" id="acctMenu">
+              <div class="menu-item active"><span class="dot amber"></span>Practice account<b class="mono" id="balance2"></b></div>
+              <div class="menu-item disabled"><span class="dot green"></span>Real account<small>coming soon</small></div>
+              <button class="menu-item" id="refill">↻ Top up practice balance to $10,000</button>
+            </div>
+          </div>
+          <button class="deposit" id="deposit">Deposit</button>
+          <div class="avatar" title="Profile">P</div>
+        </div>
+      </header>
+
+      <!-- ================= left sidebar ================= -->
+      <nav class="side">
+        <button class="side-btn" data-drawer="open">
+          <svg viewBox="0 0 24 24"><path d="M4 18V9m5 9V5m5 13v-7m5 7V8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" /></svg>
+          <span>Trades</span><i class="count hidden" id="openCount">0</i>
+        </button>
+        <button class="side-btn" data-drawer="history">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8" fill="none" stroke="currentColor" stroke-width="2" /><path d="M12 8v4l3 2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" /></svg>
+          <span>History</span>
+        </button>
+        <button class="side-btn soon" title="Coming soon">
+          <svg viewBox="0 0 24 24"><path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0zM7 6H4a3 3 0 0 0 3 4M17 6h3a3 3 0 0 1-3 4" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" /></svg>
+          <span>Leaders</span>
+        </button>
+        <button class="side-btn soon" title="Coming soon">
+          <svg viewBox="0 0 24 24"><path d="M4 5h16v11H9l-5 4z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" /></svg>
+          <span>Chats</span>
+        </button>
+        <button class="side-btn soon" title="Coming soon">
+          <svg viewBox="0 0 24 24"><path d="M4 4v16h16" fill="none" stroke="currentColor" stroke-width="2" /><path d="m7 14 4-4 3 3 5-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /></svg>
+          <span>Analysis</span>
+        </button>
+        <div class="side-spacer"></div>
+        <button class="side-btn soon" title="Coming soon">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2" /><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .9-1 1.6V14M12 17.5v.01" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" /></svg>
+          <span>Help</span>
+        </button>
+      </nav>
+
+      <aside class="drawer" id="drawer">
+        <div class="drawer-head">
+          <h3 id="drawerTitle">Open trades</h3>
+          <button class="icon-btn small" id="drawerClose" aria-label="Close">✕</button>
+        </div>
+        <div class="stats" id="stats"></div>
+        <div class="drawer-list" id="drawerList"></div>
+      </aside>
+
+      <!-- ================= chart ================= -->
+      <section class="chart-wrap" id="chartWrap">
+        <div class="worldmap"></div>
+        <div class="watermark" id="watermark"></div>
+        <div class="chart-head">
+          <img id="assetIcon" alt="" />
+          <div>
+            <div class="asset-name"><span id="assetName">BTC/USD</span> <span class="mode-tag" id="modeTag">Turbo</span></div>
+            <div class="asset-sub"><span id="feedStatus" class="status connecting">connecting…</span></div>
+          </div>
+        </div>
+
+        <div class="sentiment" title="Buy vs sell volume on Binance over the last 60 seconds">
+          <span class="s-up mono" id="sUp">50%</span>
+          <div class="s-bar"><div class="s-fill" id="sFill"></div></div>
+          <span class="s-down mono" id="sDown">50%</span>
+        </div>
+
+        <div id="canvasHost" class="canvas-host"></div>
+
+        <div id="positions" class="positions hidden"></div>
+
+        <div class="chart-tools">
+          <div class="seg" id="modeSeg">
+            <button data-mode="area" title="Area chart">
+              <svg viewBox="0 0 24 24"><path d="M3 17l5-6 4 3 5-7 4 4v9H3z" fill="currentColor" opacity=".35" /><path d="M3 17l5-6 4 3 5-7 4 4" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" /></svg>
+            </button>
+            <button data-mode="candles" title="Candlesticks">
+              <svg viewBox="0 0 24 24"><path d="M7 3v18M17 5v14" stroke="currentColor" stroke-width="1.6" /><rect x="4.5" y="7" width="5" height="9" rx="1" fill="currentColor" /><rect x="14.5" y="9" width="5" height="6" rx="1" fill="none" stroke="currentColor" stroke-width="1.6" /></svg>
+            </button>
+          </div>
+          <div class="seg" id="candleSeg"></div>
+          <div class="seg" title="Zoom (or use the mouse wheel over the chart)">
+            <button id="zoomOut" aria-label="Zoom out">−</button>
+            <button id="zoomIn" aria-label="Zoom in">+</button>
+          </div>
+          <button class="tool soon" title="Indicators — coming soon">
+            <svg viewBox="0 0 24 24"><path d="M3 12h4l3-7 4 14 3-7h4" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" /></svg>
+          </button>
+          <button class="tool soon" title="Drawing tools — coming soon">
+            <svg viewBox="0 0 24 24"><path d="M4 20l4-1L19 8l-3-3L5 16z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" /></svg>
+          </button>
+        </div>
+
+        <div id="flash" class="flash"></div>
+        <div id="toast" class="toast"></div>
+        <div id="loading" class="loading"><div class="spinner"></div>Loading market…</div>
+      </section>
+
+      <!-- ================= right panel ================= -->
+      <aside class="panel">
+        <div class="box">
+          <label>Amount</label>
+          <div class="stepper">
+            <button data-stake="-" aria-label="Decrease">−</button>
+            <div class="val mono"><span>$</span><input id="stake" inputmode="numeric" value="100" /></div>
+            <button data-stake="+" aria-label="Increase">+</button>
+          </div>
+          <div class="chips" id="stakeChips"></div>
+        </div>
+
+        <div class="box exp">
+          <label>Expiration</label>
+          <button class="exp-btn" id="expBtn">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="13" r="8" fill="none" stroke="currentColor" stroke-width="2" /><path d="M12 9v4l2.5 2M9 2h6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" /></svg>
+            <span class="exp-main mono" id="expLabel">--:--</span>
+            <span class="exp-sub" id="expSub"></span>
+            <svg viewBox="0 0 12 12" class="caret"><path d="M3 4.5 6 7.5 9 4.5" fill="none" stroke="currentColor" stroke-width="1.6" /></svg>
+          </button>
+          <div class="menu hidden" id="expMenu"></div>
+        </div>
+
+        <div class="profit">
+          <label>Profit</label>
+          <div class="pct" id="pct">+86%</div>
+          <div class="amt mono" id="profitAmt">+$86.00</div>
+        </div>
+
+        <div class="buttons">
+          <button class="trade up" id="btnUp">
+            <span class="t-label">Higher</span>
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12l7-7 7 7" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="square" /></svg>
+            <kbd>W</kbd>
+          </button>
+          <button class="trade down" id="btnDown">
+            <span class="t-label">Lower</span>
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12l7 7 7-7" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="square" /></svg>
+            <kbd>S</kbd>
+          </button>
+        </div>
+        <p class="hint" id="panelHint">Practice money only.</p>
+      </aside>
+    </div>
+
+    <!-- ================= asset picker ================= -->
+    <div class="modal hidden" id="picker">
+      <div class="sheet">
+        <div class="sheet-head">
+          <h3>Choose an asset</h3>
+          <input id="pickerSearch" placeholder="Search…" autocomplete="off" />
+          <button class="icon-btn small" id="pickerClose" aria-label="Close">✕</button>
+        </div>
+        <div class="sheet-cols"><span>Asset</span><span>Price</span><span>24h</span><span>Profit</span></div>
+        <div class="sheet-list" id="pickerList"></div>
+      </div>
+    </div>
+
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
